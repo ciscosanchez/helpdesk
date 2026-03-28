@@ -1,13 +1,58 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TriagedTicket {
+  id             String    @id @default(cuid())
+  zammadTicketId Int       @unique @map("zammad_ticket_id")
+  ticketNumber   String    @map("ticket_number")
+  subject        String
+  fromEmail      String    @map("from_email")
+  fromName       String?   @map("from_name")
+  body           String
+  category       String    // access_request | password_reset | software_howto | security_report | hardware | external_vendor | junk | billing_netsuite | email_issue | other
+  priority       Int       // 1 (exec/urgent) – 5 (noise)
+  confidence     Int       // 0–100
+  draftReply     String?   @map("draft_reply")
+  autoAction     String?   @map("auto_action") // auto_closed | auto_replied | pending_human
+  reviewedBy     String?   @map("reviewed_by")
+  reviewedAt     DateTime? @map("reviewed_at")
+  sentAt         DateTime? @map("sent_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@map("triaged_tickets")
+}
+
+model KbArticle {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  category  String
+  keywords  String[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("kb_articles")
+}
+
+model AccessRequest {
+  id             String   @id @default(cuid())
+  requesterName  String   @map("requester_name")
+  requesterEmail String   @map("requester_email")
+  systemNeeded   String   @map("system_needed")
+  reason         String
+  managerEmail   String   @map("manager_email")
+  status         String   @default("pending") // pending | approved | denied
+  zammadTicketId Int?     @map("zammad_ticket_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("access_requests")
 }

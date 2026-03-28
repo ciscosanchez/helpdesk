@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Ticket</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:#1a1a1a;border-radius:10px 10px 0 0;padding:20px 28px;">
+              <span style="color:#fff;font-size:15px;font-weight:600;letter-spacing:-0.2px;">Armstrong IT Helpdesk</span>
+              <span style="color:#666;font-size:13px;float:right;padding-top:2px;">New Ticket</span>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="background:#fff;padding:28px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;letter-spacing:0.4px;text-transform:uppercase;">NEW</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <p style="margin:0;font-size:18px;font-weight:600;color:#111;line-height:1.4;"><%= @ticket.title %></p>
+                    <p style="margin:6px 0 0;font-size:13px;color:#888;">Ticket #<%= @ticket.number %></p>
+                  </td>
+                </tr>
+
+                <!-- Metadata grid -->
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f9f9;border-radius:8px;padding:16px;">
+                      <tr>
+                        <td style="font-size:12px;color:#888;padding-bottom:10px;width:100px;">From</td>
+                        <td style="font-size:13px;color:#111;padding-bottom:10px;font-weight:500;"><%= @ticket.customer.fullname %> &lt;<%= @ticket.customer.email %>&gt;</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:12px;color:#888;padding-bottom:10px;">Group</td>
+                        <td style="font-size:13px;color:#111;padding-bottom:10px;"><%= @ticket.group.name %></td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:12px;color:#888;padding-bottom:10px;">Priority</td>
+                        <td style="font-size:13px;color:#111;padding-bottom:10px;"><%= @ticket.priority.name %></td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:12px;color:#888;">State</td>
+                        <td style="font-size:13px;color:#111;"><%= @ticket.state.name %></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Message body -->
+                <% if @article %>
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <p style="margin:0 0 8px;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Message</p>
+                    <div style="font-size:14px;color:#333;line-height:1.6;border-left:3px solid #e5e7eb;padding-left:14px;white-space:pre-wrap;"><%= @article.body %></div>
+                  </td>
+                </tr>
+                <% end %>
+
+                <!-- CTA -->
+                <tr>
+                  <td>
+                    <a href="<%= @base_url %>/#ticket/zoom/<%= @ticket.id %>"
+                       style="display:inline-block;background:#1a1a1a;color:#fff;font-size:14px;font-weight:500;padding:11px 22px;border-radius:7px;text-decoration:none;">
+                      Open Ticket →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#f0f0f0;border-radius:0 0 10px 10px;padding:14px 28px;text-align:center;">
+              <p style="margin:0;font-size:11px;color:#999;">Armstrong Relocation &amp; Companies · IT Helpdesk · This is an automated notification</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

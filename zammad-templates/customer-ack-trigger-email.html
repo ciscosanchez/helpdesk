@@ -1,0 +1,64 @@
+<!--
+  CUSTOMER-FACING ACKNOWLEDGMENT EMAIL
+  =====================================
+  Set this as the body of a Zammad Trigger:
+    Admin > Manage > Triggers > New Trigger
+    Activator: action
+    Condition: Ticket > Action > is > created
+    Action: Send Email > To: Customer
+    Subject: We received your request [Ticket ##{ticket.number}]
+
+  Copy the HTML below into the email body (switch to HTML source mode).
+-->
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+
+          <tr>
+            <td style="background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:36px 32px;">
+
+              <p style="margin:0 0 24px;font-size:13px;font-weight:600;color:#888;letter-spacing:0.5px;text-transform:uppercase;">Armstrong IT Helpdesk</p>
+
+              <p style="margin:0 0 8px;font-size:20px;font-weight:600;color:#111;">We got your request.</p>
+              <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6;">
+                Hi #{ticket.customer.firstname},<br><br>
+                Your ticket has been received and our team will be in touch shortly.
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:28px;">
+                <tr>
+                  <td style="font-size:12px;color:#888;padding-bottom:8px;width:110px;">Ticket number</td>
+                  <td style="font-size:13px;font-weight:600;color:#111;padding-bottom:8px;">##{ticket.number}</td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;color:#888;">Subject</td>
+                  <td style="font-size:13px;color:#111;">#{ticket.title}</td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 8px;font-size:13px;color:#555;line-height:1.6;">
+                <strong>Need something faster?</strong><br>
+                For password resets, visit <a href="https://aka.ms/sspr" style="color:#2563eb;">aka.ms/sspr</a><br>
+                For system access requests, visit <a href="https://helpdesk.goarmstrong.com/request" style="color:#2563eb;">helpdesk.goarmstrong.com/request</a>
+              </p>
+
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:16px 0;text-align:center;">
+              <p style="margin:0;font-size:11px;color:#aaa;">Armstrong Relocation &amp; Companies · helpdesk@goarmstrong.com</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
