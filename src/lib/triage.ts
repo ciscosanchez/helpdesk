@@ -1,6 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { getSetting } from "./settings";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+async function getClient(): Promise<Anthropic> {
+  const apiKey = await getSetting("ANTHROPIC_API_KEY");
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not configured. Set it in Settings or .env");
+  return new Anthropic({ apiKey });
+}
 
 export type TicketCategory =
   | "access_request"
@@ -129,6 +134,7 @@ Subject: ${opts.subject}
 Body:
 ${opts.body.slice(0, 4000)}`; // cap to avoid token bloat
 
+  const client = await getClient();
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 1024,

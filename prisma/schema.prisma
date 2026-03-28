@@ -41,6 +41,15 @@ model KbArticle {
   @@map("kb_articles")
 }
 
+model Setting {
+  key       String   @id
+  value     String
+  updatedBy String?  @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
 model AccessRequest {
   id             String   @id @default(cuid())
   requesterName  String   @map("requester_name")

@@ -24,14 +24,16 @@ npm run dev
 
 The remaining keys you need before the app is fully functional:
 
-| Key | Where to get it |
-|---|---|
-| `ANTHROPIC_API_KEY` | [console.anthropic.com/settings/api-keys](https://console.anthropic.com/settings/api-keys) |
-| `ZAMMAD_URL` + `ZAMMAD_TOKEN` | Your Zammad instance — see [Zammad Configuration](zammad-configuration.md) |
-| `ZAMMAD_WEBHOOK_SECRET` | Any random string — must match what you set in Zammad |
-| `RESEND_API_KEY` | [resend.com](https://resend.com) — needs a verified sending domain |
-| `AUTH_SECRET` | Run: `openssl rand -base64 32` |
-| `AZURE_AD_*` | Azure AD app registration — see Microsoft SSO section below |
+| Key | Where to get it | How to set |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | [console.anthropic.com/settings/api-keys](https://console.anthropic.com/settings/api-keys) | Dashboard Settings page or `.env` |
+| `ZAMMAD_URL` + `ZAMMAD_TOKEN` | Your Zammad instance — see [Zammad Configuration](zammad-configuration.md) | Dashboard Settings page or `.env` |
+| `ZAMMAD_WEBHOOK_SECRET` | Any random string — must match what you set in Zammad | Dashboard Settings page or `.env` |
+| `RESEND_API_KEY` | [resend.com](https://resend.com) — needs a verified sending domain | Dashboard Settings page or `.env` |
+| `AUTH_SECRET` | Run: `openssl rand -base64 32` | `.env` only |
+| `AZURE_AD_*` | Azure AD app registration — see Microsoft SSO section below | `.env` only (needed before login) |
+
+> **Tip:** Once the app is running, go to **Dashboard → Settings** to enter credentials in the UI instead of editing `.env`. Values saved there are stored in the database and survive redeploys without touching environment variables. The Azure AD and `AUTH_SECRET` values are the only ones that must stay in `.env` because they're needed before you can log in.
 
 ---
 

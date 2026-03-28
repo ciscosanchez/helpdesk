@@ -25,6 +25,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <Link href="/request" className="px-3 py-1.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
                 Self-Service Form ↗
               </Link>
+              <Link href="/dashboard/settings" className="px-3 py-1.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                Settings
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-3">

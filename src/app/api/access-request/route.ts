@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { Resend } from "resend";
 import { postArticle } from "@/lib/zammad";
+import { getSetting } from "@/lib/settings";
 import { z } from "zod";
-
-const resend = new Resend(process.env.RESEND_API_KEY!);
 
 const schema = z.object({
   requesterName: z.string().min(2),
@@ -19,14 +18,22 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = schema.parse(body);
 
+    const [resendKey, resendFrom, zammadUrl, zammadToken] = await Promise.all([
+      getSetting("RESEND_API_KEY"),
+      getSetting("RESEND_FROM"),
+      getSetting("ZAMMAD_URL"),
+      getSetting("ZAMMAD_TOKEN"),
+    ]);
+    const resend = new Resend(resendKey!);
+
     // Save to DB
     const accessRequest = await db.accessRequest.create({ data });
 
     // Create a Zammad ticket via API (structured, tagged — no email noise)
     let zammadTicketId: number | null = null;
     try {
-      const ZAMMAD_URL = process.env.ZAMMAD_URL!;
-      const ZAMMAD_TOKEN = process.env.ZAMMAD_TOKEN!;
+      const ZAMMAD_URL = zammadUrl!;
+      const ZAMMAD_TOKEN = zammadToken!;
 
       const res = await fetch(`${ZAMMAD_URL}/api/v1/tickets`, {
         method: "POST",
@@ -73,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Email the manager
     await resend.emails.send({
-      from: process.env.RESEND_FROM!,
+      from: resendFrom ?? "IT Helpdesk <helpdesk@goarmstrong.com>",
       to: data.managerEmail,
       subject: `Access Request: ${data.requesterName} needs ${data.systemNeeded}`,
       html: `
@@ -94,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     // Confirmation email to requester
     await resend.emails.send({
-      from: process.env.RESEND_FROM!,
+      from: resendFrom ?? "IT Helpdesk <helpdesk@goarmstrong.com>",
       to: data.requesterEmail,
       subject: `Your access request for ${data.systemNeeded} has been received`,
       html: `

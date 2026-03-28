@@ -1,5 +1,14 @@
-const ZAMMAD_URL = process.env.ZAMMAD_URL!;
-const ZAMMAD_TOKEN = process.env.ZAMMAD_TOKEN!;
+import { getSetting } from "./settings";
+
+async function getCredentials() {
+  const [url, token] = await Promise.all([
+    getSetting("ZAMMAD_URL"),
+    getSetting("ZAMMAD_TOKEN"),
+  ]);
+  if (!url) throw new Error("ZAMMAD_URL is not configured. Set it in Settings or .env");
+  if (!token) throw new Error("ZAMMAD_TOKEN is not configured. Set it in Settings or .env");
+  return { url, token };
+}
 
 export interface ZammadTicket {
   id: number;
@@ -43,11 +52,12 @@ export interface ZammadWebhookPayload {
 }
 
 async function zammadFetch(path: string, init?: RequestInit) {
-  const url = `${ZAMMAD_URL}/api/v1${path}`;
+  const { url: baseUrl, token } = await getCredentials();
+  const url = `${baseUrl}/api/v1${path}`;
   const res = await fetch(url, {
     ...init,
     headers: {
-      Authorization: `Token token=${ZAMMAD_TOKEN}`,
+      Authorization: `Token token=${token}`,
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),
     },
