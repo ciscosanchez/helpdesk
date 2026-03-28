@@ -32,7 +32,7 @@ IT staff open the dashboard, see what needs review, edit the draft if needed, an
 | `GET /dashboard/analytics` | Category breakdown, deflection rate over time |
 | `GET /request` | Public self-service access request form |
 | Resend | Sends manager approval emails + requester confirmations |
-| PostgreSQL + Prisma | Stores triage results, access requests, KB articles |
+| PostgreSQL 16 + Prisma 7 | Stores triage results, access requests, KB articles |
 
 ---
 
@@ -66,29 +66,39 @@ IT staff open the dashboard, see what needs review, edit the draft if needed, an
 
 ---
 
-## Quick start
+## Current status
+
+| Item | Status |
+|---|---|
+| Next.js app scaffolded | Done |
+| PostgreSQL 16 database | Done — `armstrong_helpdesk` on localhost:5432 |
+| Prisma schema + tables | Done — all 3 tables created |
+| Claude triage engine | Done |
+| Zammad webhook receiver | Done |
+| IT dashboard + analytics | Done |
+| Self-service access form | Done |
+| Email template redesigns | Done |
+| Zammad configuration | Pending — see [docs/zammad-configuration.md](docs/zammad-configuration.md) |
+| API keys / env vars | Pending — fill in `.env` |
+| Microsoft SSO (Azure AD) | Pending — see [docs/setup-guide.md](docs/setup-guide.md) |
+| Production deployment | Pending |
+
+---
+
+## Quick start (on this machine)
+
+The database is already set up. To run locally, add your API keys to `.env` and start the server:
 
 ```bash
-# 1. Clone
-git clone git@github.com:ciscosanchez/helpdesk.git
-cd helpdesk
+# Add your keys to .env
+# ANTHROPIC_API_KEY, ZAMMAD_URL, ZAMMAD_TOKEN, RESEND_API_KEY, AUTH_SECRET, AZURE_AD_*
 
-# 2. Install
-npm install
-
-# 3. Configure
-cp .env.example .env
-# Fill in .env — see docs/setup-guide.md
-
-# 4. Set up database
-npx prisma generate
-npx prisma db push
-
-# 5. Run
 npm run dev
 ```
 
-See [docs/setup-guide.md](docs/setup-guide.md) for the full setup including Zammad configuration.
+Open [http://localhost:3000](http://localhost:3000).
+
+For a fresh machine setup, see [docs/setup-guide.md](docs/setup-guide.md).
 
 ---
 
@@ -96,7 +106,7 @@ See [docs/setup-guide.md](docs/setup-guide.md) for the full setup including Zamm
 
 - **Next.js 15** (App Router) + TypeScript + Tailwind CSS 4
 - **shadcn/ui** component library
-- **Prisma** + **PostgreSQL**
+- **Prisma 7** + **PostgreSQL 16**
 - **Anthropic Claude** (`claude-sonnet-4-6`) for ticket triage
 - **Resend** for transactional email
 - **NextAuth v5** with **Microsoft Entra ID** (SSO)

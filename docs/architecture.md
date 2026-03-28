@@ -156,7 +156,8 @@ src/
 │   └── ui/                 ← shadcn/ui components
 ├── middleware.ts       ← Route protection (all except /request + webhooks)
 prisma/
-└── schema.prisma       ← DB schema
+├── schema.prisma       ← DB models (no datasource url — see prisma.config.ts)
+└── prisma.config.ts    ← Prisma 7 config — reads DATABASE_URL from .env
 zammad-templates/
 ├── ticket_create-en.html.erb.custom   ← Agent notification: new ticket
 ├── ticket_update-en.html.erb.custom   ← Agent notification: ticket updated
@@ -176,6 +177,29 @@ Public routes (no auth required):
 - `/login` — login page
 
 Everything else requires an authenticated session. To swap auth providers in the future, edit `src/lib/auth.ts` — one file change.
+
+---
+
+## Database
+
+**Engine:** PostgreSQL 16, running locally on `localhost:5432`
+**Database name:** `armstrong_helpdesk`
+**ORM:** Prisma 7
+
+Prisma 7 uses a `prisma.config.ts` file at the project root to configure the datasource URL — unlike earlier Prisma versions where the `url` lived inside `schema.prisma`. The schema only declares the provider (`postgresql`); the actual connection string is read from `DATABASE_URL` in `.env` at runtime via `prisma.config.ts`.
+
+```typescript
+// prisma.config.ts
+import "dotenv/config";
+import { defineConfig } from "prisma/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  datasource: { url: process.env["DATABASE_URL"] },
+});
+```
+
+This means **`npx prisma generate` must be run with a valid `.env` present**, otherwise Prisma won't know the database URL.
 
 ---
 
