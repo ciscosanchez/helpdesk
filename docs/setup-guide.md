@@ -37,6 +37,24 @@ The remaining keys you need before the app is fully functional:
 
 ---
 
+## Getting rid of dev mode (switching to real Microsoft SSO)
+
+When Azure AD env vars are empty, the app uses a dev-only login (any email + any password). To switch to real Microsoft SSO:
+
+1. Create an Azure AD app registration — see [authentication.md](authentication.md) for the full step-by-step
+2. Fill in `.env`:
+   ```
+   AUTH_SECRET="<openssl rand -base64 32>"
+   AZURE_AD_CLIENT_ID="<from Azure portal>"
+   AZURE_AD_CLIENT_SECRET="<from Azure portal>"
+   AZURE_AD_ISSUER="https://login.microsoftonline.com/<tenant-id>/v2.0"
+   ```
+3. Restart the server — dev mode disappears automatically
+
+That's it. No code changes needed.
+
+---
+
 ## Setting up on a new machine
 
 ### Prerequisites
@@ -85,7 +103,24 @@ npx prisma studio
 ```
 Opens a browser UI at `localhost:5555` to browse the database.
 
-### Step 4 — Configure Zammad
+### Step 4 — Enter credentials in the Settings screen
+
+Once the app is running, you can enter most credentials through the browser instead of editing `.env`.
+
+1. Open `http://localhost:3000/login` and sign in
+2. Go to **Dashboard → Settings** (top nav)
+3. Enter your credentials for:
+   - Zammad URL + API Token + Webhook Secret
+   - Anthropic API Key
+   - Resend API Key + From Address
+4. Click **Save Settings**
+5. Click **Test Connection** in the Zammad section to verify it's working
+
+Values saved here are stored in the database and override `.env` variables. They survive redeploys without touching any files.
+
+> The only credentials that cannot be managed here are `AUTH_SECRET` and the three `AZURE_AD_*` values — they are needed before you can log in, so they must be in `.env`.
+
+### Step 5 — Configure Zammad
 
 See [zammad-configuration.md](zammad-configuration.md) for step-by-step Zammad setup. In summary:
 
@@ -95,13 +130,13 @@ See [zammad-configuration.md](zammad-configuration.md) for step-by-step Zammad s
 4. Create a trigger to fire the webhook on new ticket
 5. (Optional) Install the redesigned email templates
 
-### Step 5 — Run locally
+### Step 6 — Run locally
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — you'll be redirected to `/dashboard` and prompted to log in with Microsoft.
+Open [http://localhost:3000](http://localhost:3000). If Azure AD is configured you'll see a "Sign in with Microsoft" button. If not, you'll see a dev login form — enter any email and password to access the dashboard.
 
 To test the webhook locally, expose your local port with [ngrok](https://ngrok.com):
 ```bash

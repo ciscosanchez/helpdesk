@@ -115,6 +115,12 @@ AccessRequest
 ├── zammadTicketId (linked Zammad ticket)
 └── createdAt / updatedAt
 
+Setting
+├── key (primary key — one of the 6 known setting keys)
+├── value (stored in plaintext — DB access is restricted)
+├── updatedBy (email of the staff member who last saved it)
+└── updatedAt
+
 KbArticle (for future use)
 ├── id, title, body, category, keywords[], active
 └── createdAt / updatedAt
@@ -133,11 +139,16 @@ src/
 │   │   ├── tickets/[id]/approve/route.ts ← POST: send approved draft
 │   │   ├── tickets/route.ts            ← GET ticket list
 │   │   ├── access-request/route.ts     ← POST: self-service form handler
+│   │   ├── settings/route.ts           ← GET statuses / POST save credentials
+│   │   ├── settings/test/route.ts      ← POST: test Zammad connection
 │   │   └── auth/[...nextauth]/route.ts ← NextAuth SSO handler
 │   ├── dashboard/
 │   │   ├── page.tsx                    ← Ticket queue
 │   │   ├── layout.tsx                  ← Nav + auth check
 │   │   ├── analytics/page.tsx          ← Analytics
+│   │   ├── settings/
+│   │   │   ├── page.tsx                ← Settings page (server)
+│   │   │   └── settings-form.tsx       ← Credential form (client)
 │   │   └── tickets/[id]/
 │   │       ├── page.tsx                ← Ticket detail (server)
 │   │       └── ticket-actions.tsx      ← Draft editor + approve (client)
@@ -154,10 +165,10 @@ src/
 ├── components/
 │   ├── category-badge.tsx  ← CategoryBadge + PriorityBadge
 │   └── ui/                 ← shadcn/ui components
-├── middleware.ts       ← Route protection (all except /request + webhooks)
+├── proxy.ts            ← Route protection (all except /request + webhooks)
 prisma/
 ├── schema.prisma       ← DB models (no datasource url — see prisma.config.ts)
-└── prisma.config.ts    ← Prisma 7 config — reads DATABASE_URL from .env
+prisma.config.ts        ← Prisma 7 config — reads DATABASE_URL from .env
 zammad-templates/
 ├── ticket_create-en.html.erb.custom   ← Agent notification: new ticket
 ├── ticket_update-en.html.erb.custom   ← Agent notification: ticket updated
@@ -176,7 +187,15 @@ Public routes (no auth required):
 - `/api/auth/*` — NextAuth endpoints
 - `/login` — login page
 
-Everything else requires an authenticated session. To swap auth providers in the future, edit `src/lib/auth.ts` — one file change.
+Everything else requires an authenticated session. Route protection is in `src/proxy.ts` (Next.js 16 renamed `middleware.ts` → `proxy.ts`).
+
+**Dev mode:** When Azure AD env vars are not set, a simple dev login is available on the login page (any email + any password). It activates automatically in `NODE_ENV=development` only. See [authentication.md](authentication.md) for full setup instructions including how to get rid of dev mode.
+
+## Settings screen
+
+Credentials can be entered through the browser at `/dashboard/settings` instead of editing `.env`. Values are stored in the `settings` table in PostgreSQL and take priority over `.env` variables. The settings service (`src/lib/settings.ts`) maintains a 60-second in-process cache to avoid repeated DB reads per request.
+
+Azure AD credentials (`AZURE_AD_*`, `AUTH_SECRET`) are the only ones that cannot be managed through the Settings screen — they are required before you can log in, so they must remain in `.env`.
 
 ---
 

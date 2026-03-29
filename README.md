@@ -30,9 +30,10 @@ IT staff open the dashboard, see what needs review, edit the draft if needed, an
 | `GET /dashboard` | IT staff queue — all tickets with AI analysis |
 | `GET /dashboard/tickets/[id]` | Ticket detail — draft editor, approve & send |
 | `GET /dashboard/analytics` | Category breakdown, deflection rate over time |
+| `GET /dashboard/settings` | Enter API credentials in the browser (no .env editing needed) |
 | `GET /request` | Public self-service access request form |
 | Resend | Sends manager approval emails + requester confirmations |
-| PostgreSQL 16 + Prisma 7 | Stores triage results, access requests, KB articles |
+| PostgreSQL 16 + Prisma 7 | Stores triage results, access requests, settings |
 
 ---
 
@@ -57,12 +58,14 @@ IT staff open the dashboard, see what needs review, edit the draft if needed, an
 
 | Doc | What it covers |
 |---|---|
-| [Architecture](docs/architecture.md) | System design, data flow, component diagram |
+| [Architecture](docs/architecture.md) | System design, data flow, component diagram, database schema |
 | [Setup Guide](docs/setup-guide.md) | Prerequisites, environment variables, database, deployment |
-| [Zammad Configuration](docs/zammad-configuration.md) | Postmaster filters, webhook trigger, custom fields, email templates |
+| [Authentication](docs/authentication.md) | Dev mode login, Azure AD SSO setup, removing dev mode |
+| [Settings Screen](docs/settings-screen.md) | Entering credentials in the browser dashboard |
+| [Zammad Configuration](docs/zammad-configuration.md) | Postmaster filters, webhook, custom fields, triggers |
 | [How Triage Works](docs/how-triage-works.md) | Categories, priorities, Claude prompting, auto-actions |
-| [Self-Service Form](docs/self-service-form.md) | The `/request` form — sharing it, customizing systems, approval flow |
-| [Email Templates](docs/email-templates.md) | Installing the new Zammad notification email designs |
+| [Self-Service Form](docs/self-service-form.md) | The `/request` form — sharing it, customizing, approval flow |
+| [Email Templates](docs/email-templates.md) | Installing the redesigned Zammad notification emails |
 
 ---
 
@@ -72,42 +75,58 @@ IT staff open the dashboard, see what needs review, edit the draft if needed, an
 |---|---|
 | Next.js app scaffolded | Done |
 | PostgreSQL 16 database | Done — `armstrong_helpdesk` on localhost:5432 |
-| Prisma schema + tables | Done — all 3 tables created |
+| Prisma schema + tables | Done — all tables created |
 | Claude triage engine | Done |
 | Zammad webhook receiver | Done |
 | IT dashboard + analytics | Done |
+| Settings screen (DB-backed credentials) | Done |
 | Self-service access form | Done |
 | Email template redesigns | Done |
+| Microsoft SSO (Azure AD) | Pending — using dev login locally for now |
 | Zammad configuration | Pending — see [docs/zammad-configuration.md](docs/zammad-configuration.md) |
-| API keys / env vars | Pending — fill in `.env` |
-| Microsoft SSO (Azure AD) | Pending — see [docs/setup-guide.md](docs/setup-guide.md) |
+| API keys (Zammad, Anthropic, Resend) | Pending — enter via Settings screen once you have them |
 | Production deployment | Pending |
 
 ---
 
-## Quick start (on this machine)
+## Quick start (this machine — dev mode)
 
-The database is already set up. To run locally, add your API keys to `.env` and start the server:
+The database is already running. The app starts in dev mode (no Azure AD needed):
 
 ```bash
-# Add your keys to .env
-# ANTHROPIC_API_KEY, ZAMMAD_URL, ZAMMAD_TOKEN, RESEND_API_KEY, AUTH_SECRET, AZURE_AD_*
-
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000/login](http://localhost:3000/login) — enter any email and any password to access the dashboard.
 
-For a fresh machine setup, see [docs/setup-guide.md](docs/setup-guide.md).
+Enter your API credentials at [http://localhost:3000/dashboard/settings](http://localhost:3000/dashboard/settings).
+
+---
+
+## Switching from dev mode to real Microsoft SSO
+
+Three steps — no code changes needed:
+
+1. Create an Azure AD app registration at [portal.azure.com](https://portal.azure.com)
+2. Add these to `.env`:
+   ```
+   AUTH_SECRET="<openssl rand -base64 32>"
+   AZURE_AD_CLIENT_ID="..."
+   AZURE_AD_CLIENT_SECRET="..."
+   AZURE_AD_ISSUER="https://login.microsoftonline.com/<tenant-id>/v2.0"
+   ```
+3. Restart the server
+
+See [docs/authentication.md](docs/authentication.md) for full step-by-step instructions.
 
 ---
 
 ## Stack
 
-- **Next.js 15** (App Router) + TypeScript + Tailwind CSS 4
+- **Next.js 16** (App Router) + TypeScript + Tailwind CSS 4
 - **shadcn/ui** component library
-- **Prisma 7** + **PostgreSQL 16**
+- **Prisma 7** + **PostgreSQL 16** + **@prisma/adapter-pg**
 - **Anthropic Claude** (`claude-sonnet-4-6`) for ticket triage
 - **Resend** for transactional email
-- **NextAuth v5** with **Microsoft Entra ID** (SSO)
+- **NextAuth v5** with **Microsoft Entra ID** (SSO) — dev credentials login when Azure AD is not configured
 - **Zammad** REST API + webhooks
